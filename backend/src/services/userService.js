@@ -1,5 +1,4 @@
 const { getDbConnection } = require('../utils/database');
-const { processPassword, comparePassword } = require('../utils/passwordUtils');
 const sql = require('mssql');
 
 class UserService {
@@ -64,13 +63,11 @@ class UserService {
         throw new Error('El nombre de usuario ya existe');
       }
 
-      const processedPassword = await processPassword(contraseña);
-
       const pool = await getDbConnection();
       const result = await pool.request()
         .input('nombre', sql.NVarChar(100), nombre)
         .input('usuario', sql.NVarChar(50), usuario)
-        .input('contraseña', sql.NVarChar(255), processedPassword)
+        .input('contraseña', sql.NVarChar(255), contraseña)
         .input('rol', sql.NVarChar(20), rol)
         .query(`
           INSERT INTO Usuarios (Nombre, Usuario, Contraseña, Rol)
@@ -93,7 +90,7 @@ class UserService {
       }
 
       if (updateData.contraseña) {
-        updateData.contraseña = await processPassword(updateData.contraseña);
+        // Guardar contraseña en texto plano
       }
 
       const pool = await getDbConnection();
@@ -173,7 +170,7 @@ class UserService {
       }
 
       console.log('💾 Contraseña en DB:', user.Contraseña);
-      const isValidPassword = await comparePassword(contraseña, user.Contraseña);
+      const isValidPassword = contraseña === user.Contraseña; // Comparación directa sin encriptación
       console.log('🔐 Resultado validación contraseña:', isValidPassword);
       
       if (!isValidPassword) {
@@ -203,17 +200,15 @@ class UserService {
         throw new Error('Usuario no encontrado');
       }
 
-      const isValidCurrentPassword = await comparePassword(currentPassword, user.Contraseña);
+      const isValidCurrentPassword = currentPassword === user.Contraseña; // Comparación directa
       if (!isValidCurrentPassword) {
         throw new Error('Contraseña actual incorrecta');
       }
 
-      const processedNewPassword = await processPassword(newPassword);
-
       const pool = await getDbConnection();
       await pool.request()
         .input('id', sql.Int, id)
-        .input('contraseña', sql.NVarChar(255), processedNewPassword)
+        .input('contraseña', sql.NVarChar(255), newPassword) // Guardar nueva contraseña sin encriptar
         .query('UPDATE Usuarios SET Contraseña = @contraseña WHERE Id = @id');
       
       return true;
