@@ -97,7 +97,6 @@ const UsersList = () => {
       setError(null);
       
       if (editingUser) {
-        ualizar usuario existente
         const updateData = { ...formData };
         if (!updateData.contraseña) {
           delete updateData.contraseña;
