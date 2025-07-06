@@ -1,0 +1,26 @@
+{
+  "testEnvironment": "node",
+  "setupFilesAfterEnv": ["<rootDir>/tests/setup.js"],
+  "testMatch": [
+    "<rootDir>/tests/**/*.test.js",
+    "<rootDir>/tests/**/*.spec.js"
+  ],
+  "collectCoverageFrom": [
+    "src/**/*.js",
+    "!src/config/**",
+    "!src/schemas/**", 
+    "!src/routes/**",
+    "!src/middleware/swagger.js",
+    "!src/middleware/auth.js",
+    "!src/middleware/validation.js",
+    "!src/middleware/joiValidation.js",
+    "!src/utils/database.js",
+    "!src/services/userService.js",
+    "!src/services/expedienteService.js",
+    "!**/node_modules/**"
+  ],
+  "coverageDirectory": "coverage",
+  "coverageReporters": ["text", "lcov", "html"],
+  "verbose": true,
+  "testTimeout": 10000
+}

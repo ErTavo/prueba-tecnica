@@ -1,0 +1,54 @@
+# Dockerfile para el Frontend React
+
+# Etapa de desarrollo
+FROM node:18-alpine as development
+
+# Crear directorio de trabajo
+WORKDIR /app
+
+# Copiar package.json y package-lock.json
+COPY package*.json ./
+
+# Instalar dependencias
+RUN npm ci
+
+# Copiar código fuente
+COPY . .
+
+# Exponer puerto
+EXPOSE 3000
+
+# Comando para desarrollo
+CMD ["npm", "start"]
+
+# Etapa de construcción para producción
+FROM node:18-alpine as build
+
+WORKDIR /app
+
+# Copiar package.json
+COPY package*.json ./
+
+# Instalar dependencias
+RUN npm ci --only=production
+
+# Copiar código fuente
+COPY . .
+
+# Construir la aplicación
+RUN npm run build
+
+# Etapa de producción con nginx
+FROM nginx:alpine as production
+
+# Copiar archivos construidos
+COPY --from=build /app/build /usr/share/nginx/html
+
+# Copiar configuración personalizada de nginx
+COPY nginx.conf /etc/nginx/nginx.conf
+
+# Exponer puerto
+EXPOSE 80
+
+# Comando por defecto
+CMD ["nginx", "-g", "daemon off;"]

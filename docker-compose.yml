@@ -1,0 +1,77 @@
+version: '3.8'
+
+services:
+  # Base de datos SQL Server
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: mp-dicri-sqlserver
+    environment:
+      SA_PASSWORD: huk3ym65ac8%P
+      ACCEPT_EULA: Y
+      MSSQL_PID: Express
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    networks:
+      - mp-dicri-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'huk3ym65ac8%P' -C -Q 'SELECT 1'"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  # Backend API
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mp-dicri-backend
+    env_file:
+      - ./backend/.env.docker
+    environment:
+      NODE_ENV: production
+      DB_HOST: sqlserver
+      DB_PORT: 1433
+      DB_NAME: MP_DICRI
+      DB_USER: sa
+      DB_PASSWORD: huk3ym65ac8%P
+      PORT: 3001
+    ports:
+      - "3001:3001"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    networks:
+      - mp-dicri-network
+    restart: unless-stopped
+
+  # Frontend React (desarrollo)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: ../Dockerfile.frontend
+      target: development
+    container_name: mp-dicri-frontend
+    environment:
+      REACT_APP_API_URL: http://localhost:3001
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    networks:
+      - mp-dicri-network
+    restart: unless-stopped
+    volumes:
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+      - /app/node_modules
+
+networks:
+  mp-dicri-network:
+    driver: bridge
+
+volumes:
+  sqlserver_data:

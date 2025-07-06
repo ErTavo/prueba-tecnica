@@ -1,0 +1,1534 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "MP DICRI API",
+    "version": "1.0.0",
+    "description": "API para gestión de expedientes e indicios de la DICRI - Ministerio Público",
+    "contact": {
+      "name": "Equipo de Desarrollo DICRI",
+      "email": "dev@dicri.mp.gob"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3001",
+      "description": "Servidor de desarrollo"
+    },
+    {
+      "url": "https://api.dicri.mp.gob",
+      "description": "Servidor de producción"
+    }
+  ],
+  "components": {
+    "schemas": {
+      "Usuario": {
+        "type": "object",
+        "required": [
+          "nombre",
+          "usuario",
+          "contraseña",
+          "rol"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "ID único del usuario",
+            "example": 1
+          },
+          "nombre": {
+            "type": "string",
+            "description": "Nombre completo del usuario",
+            "example": "Marco Aurelio"
+          },
+          "usuario": {
+            "type": "string",
+            "description": "Nombre de usuario único",
+            "example": "maurelio"
+          },
+          "contraseña": {
+            "type": "string",
+            "description": "Contraseña del usuario",
+            "example": "pass123"
+          },
+          "rol": {
+            "type": "string",
+            "enum": [
+              "Admin",
+              "Tecnico",
+              "Supervisor"
+            ],
+            "description": "Rol del usuario en el sistema",
+            "example": "Supervisor"
+          }
+        }
+      },
+      "UsuarioResponse": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "example": 1
+          },
+          "nombre": {
+            "type": "string",
+            "example": "Marco Aurelio"
+          },
+          "usuario": {
+            "type": "string",
+            "example": "maurelio"
+          },
+          "rol": {
+            "type": "string",
+            "example": "Supervisor"
+          }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "required": [
+          "usuario",
+          "contraseña"
+        ],
+        "properties": {
+          "usuario": {
+            "type": "string",
+            "description": "Nombre de usuario",
+            "example": "maurelio"
+          },
+          "contraseña": {
+            "type": "string",
+            "description": "Contraseña del usuario",
+            "example": "pass123"
+          }
+        }
+      },
+      "Expediente": {
+        "type": "object",
+        "required": [
+          "codigo",
+          "tecnicoId"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "ID único del expediente",
+            "example": 1
+          },
+          "codigo": {
+            "type": "string",
+            "description": "Código único del expediente",
+            "example": "EXP-2025-001"
+          },
+          "fechaRegistro": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Fecha de registro del expediente",
+            "example": "2025-01-15T10:30:00Z"
+          },
+          "estado": {
+            "type": "string",
+            "enum": [
+              "Pendiente",
+              "En proceso",
+              "Completado",
+              "Rechazado"
+            ],
+            "description": "Estado actual del expediente",
+            "example": "En proceso"
+          },
+          "observaciones": {
+            "type": "string",
+            "description": "Observaciones adicionales",
+            "example": "Caso de alta prioridad"
+          },
+          "tecnicoId": {
+            "type": "integer",
+            "description": "ID del técnico asignado",
+            "example": 1
+          }
+        }
+      },
+      "Indicio": {
+        "type": "object",
+        "required": [
+          "expedienteId",
+          "descripcion",
+          "tecnicoId"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "ID único del indicio",
+            "example": 1
+          },
+          "expedienteId": {
+            "type": "integer",
+            "description": "ID del expediente al que pertenece",
+            "example": 1
+          },
+          "descripcion": {
+            "type": "string",
+            "description": "Descripción detallada del indicio",
+            "example": "Huella dactilar encontrada en la escena"
+          },
+          "color": {
+            "type": "string",
+            "description": "Color del indicio (si aplica)",
+            "example": "Azul"
+          },
+          "tamano": {
+            "type": "string",
+            "description": "Tamaño del indicio",
+            "example": "Pequeño"
+          },
+          "peso": {
+            "type": "number",
+            "format": "float",
+            "description": "Peso del indicio en gramos",
+            "example": 125.5
+          },
+          "ubicacion": {
+            "type": "string",
+            "description": "Ubicación donde se encontró el indicio",
+            "example": "Sala"
+          },
+          "tecnicoId": {
+            "type": "integer",
+            "description": "ID del técnico que registró el indicio",
+            "example": 1
+          },
+          "fechaRegistro": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Fecha de registro del indicio",
+            "example": "2025-01-15T14:20:00Z"
+          }
+        }
+      },
+      "ApiResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "description": "Indica si la operación fue exitosa",
+            "example": true
+          },
+          "message": {
+            "type": "string",
+            "description": "Mensaje descriptivo de la operación",
+            "example": "Operación completada exitosamente"
+          },
+          "data": {
+            "description": "Datos de respuesta (varía según el endpoint)",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Usuario"
+              },
+              {
+                "$ref": "#/components/schemas/Expediente"
+              },
+              {
+                "$ref": "#/components/schemas/Indicio"
+              },
+              {
+                "type": "array"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean",
+            "example": false
+          },
+          "error": {
+            "type": "string",
+            "description": "Mensaje de error",
+            "example": "Usuario y contraseña son requeridos"
+          }
+        }
+      }
+    }
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": [
+          "Sistema"
+        ],
+        "summary": "Verificar estado del servidor",
+        "description": "Endpoint para verificar que el servidor está funcionando correctamente",
+        "responses": {
+          "200": {
+            "description": "Servidor funcionando correctamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "MP DICRI API Server está funcionando correctamente"
+                    },
+                    "timestamp": {
+                      "type": "string",
+                      "example": "2025-01-15T10:30:00Z"
+                    },
+                    "environment": {
+                      "type": "string",
+                      "example": "development"
+                    },
+                    "version": {
+                      "type": "string",
+                      "example": "1.0.0"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/usuarios": {
+      "get": {
+        "tags": [
+          "Usuarios"
+        ],
+        "summary": "Obtener todos los usuarios",
+        "description": "Retorna una lista de todos los usuarios registrados en el sistema",
+        "responses": {
+          "200": {
+            "description": "Lista de usuarios obtenida exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/UsuarioResponse"
+                          }
+                        }
+                      }
+                    }
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Usuarios obtenidos exitosamente"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/UsuarioResponse"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Error interno del servidor",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Usuarios"
+        ],
+        "summary": "Crear nuevo usuario",
+        "description": "Crea un nuevo usuario en el sistema",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Usuario"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Usuario creado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/UsuarioResponse"
+                        }
+                      }
+                    }
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Usuario creado exitosamente"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/UsuarioResponse"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Datos de entrada inválidos",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "El usuario ya existe",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/usuarios/{id}": {
+      "get": {
+        "tags": [
+          "Usuarios"
+        ],
+        "summary": "Obtener usuario por ID",
+        "description": "Retorna la información de un usuario específico",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "ID del usuario",
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usuario obtenido exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/UsuarioResponse"
+                        }
+                      }
+                    }
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Usuario obtenido exitosamente"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/UsuarioResponse"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Usuario no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Usuarios"
+        ],
+        "summary": "Actualizar usuario",
+        "description": "Actualiza la información de un usuario existente",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "ID del usuario",
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nombre": {
+                    "type": "string",
+                    "example": "Juan Pérez"
+                  },
+                  "usuario": {
+                    "type": "string",
+                    "example": "jperez"
+                  },
+                  "contraseña": {
+                    "type": "string",
+                    "example": "newpassword123"
+                  },
+                  "rol": {
+                    "type": "string",
+                    "enum": [
+                      "Admin",
+                      "Tecnico",
+                      "Supervisor"
+                    ],
+                    "example": "Tecnico"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Usuario actualizado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/UsuarioResponse"
+                        }
+                      }
+                    }
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Usuario actualizado exitosamente"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/UsuarioResponse"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Usuario no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Usuarios"
+        ],
+        "summary": "Eliminar usuario",
+        "description": "Elimina un usuario del sistema",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "ID del usuario",
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usuario eliminado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiResponse",
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Usuario eliminado exitosamente"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Usuario no encontrado",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/usuarios/login": {
+      "post": {
+        "tags": [
+          "Usuarios"
+        ],
+        "summary": "Validar login de usuario",
+        "description": "Autentica un usuario en el sistema",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest",
+                "type": "object",
+                "required": [
+                  "usuario",
+                  "contraseña"
+                ],
+                "properties": {
+                  "usuario": {
+                    "type": "string",
+                    "example": "jperez"
+                  },
+                  "contraseña": {
+                    "type": "string",
+                    "example": "password123"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login exitoso",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "isValid": {
+                              "type": "boolean",
+                              "example": true
+                            },
+                            "user": {
+                              "$ref": "#/components/schemas/UsuarioResponse"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Login exitoso"
+                    },
+                    "data": {
+                      "type": "object",
+                      "properties": {
+                        "user": {
+                          "$ref": "#/components/schemas/UsuarioResponse"
+                        },
+                        "token": {
+                          "type": "string",
+                          "nullable": true,
+                          "example": null
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Credenciales inválidas",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/expedientes": {
+      "get": {
+        "tags": [
+          "Expedientes"
+        ],
+        "summary": "Obtener todos los expedientes",
+        "description": "Retorna una lista de todos los expedientes",
+        "responses": {
+          "200": {
+            "description": "Lista de expedientes obtenida exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Expediente"
+                          }
+                        }
+                      }
+                    }
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Expedientes obtenidos exitosamente"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Expediente"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Expedientes"
+        ],
+        "summary": "Crear nuevo expediente",
+        "description": "Crea un nuevo expediente en el sistema",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Expediente",
+                "type": "object",
+                "required": [
+                  "codigo",
+                  "tecnicoId"
+                ],
+                "properties": {
+                  "codigo": {
+                    "type": "string",
+                    "example": "EXP-2025-002"
+                  },
+                  "tecnicoId": {
+                    "type": "integer",
+                    "example": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Expediente creado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/Expediente"
+                        }
+                      }
+                    }
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Expediente creado exitosamente"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Expediente"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/expedientes/{id}": {
+      "get": {
+        "tags": [
+          "Expedientes"
+        ],
+        "summary": "Obtener expediente por ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID del expediente"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Expediente obtenido exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/Expediente"
+                        }
+                      }
+                    }
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Expediente"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Expediente no encontrado"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Expedientes"
+        ],
+        "summary": "Actualizar expediente",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Expediente",
+                "type": "object",
+                "properties": {
+                  "codigo": {
+                    "type": "string"
+                  },
+                  "tecnicoId": {
+                    "type": "integer"
+                  },
+                  "estado": {
+                    "type": "string",
+                    "enum": [
+                      "Pendiente",
+                      "EnProceso",
+                      "Completado",
+                      "Rechazado"
+                    ]
+                  },
+                  "justificacionRechazo": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Expediente actualizado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Expediente"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Expediente no encontrado"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Expedientes"
+        ],
+        "summary": "Eliminar expediente",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Expediente eliminado exitosamente"
+          },
+          "404": {
+            "description": "Expediente no encontrado"
+          }
+        }
+      }
+    },
+    "/api/expedientes/{id}/estado": {
+      "put": {
+        "tags": [
+          "Expedientes"
+        ],
+        "summary": "Cambiar estado del expediente",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "estado": {
+                    "type": "string",
+                    "enum": [
+                      "Pendiente",
+                      "EnProceso",
+                      "Completado",
+                      "Rechazado"
+                    ]
+                  },
+                  "justificacionRechazo": {
+                    "type": "string",
+                    "description": "Requerido solo si el estado es 'Rechazado'"
+                  }
+                },
+                "required": [
+                  "estado"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Estado del expediente actualizado exitosamente"
+          },
+          "404": {
+            "description": "Expediente no encontrado"
+          }
+        }
+      }
+    },
+    "/api/expedientes/tecnico/{tecnicoId}": {
+      "get": {
+        "tags": [
+          "Expedientes"
+        ],
+        "summary": "Obtener expedientes por técnico",
+        "parameters": [
+          {
+            "name": "tecnicoId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID del técnico"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Expedientes del técnico obtenidos exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Expediente"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/indicios": {
+      "get": {
+        "tags": [
+          "Indicios"
+        ],
+        "summary": "Obtener todos los indicios",
+        "description": "Retorna una lista de todos los indicios",
+        "responses": {
+          "200": {
+            "description": "Lista de indicios obtenida exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/Indicio"
+                          }
+                        }
+                      }
+                    }
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Indicios obtenidos exitosamente"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Indicio"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "in": "query",
+            "name": "expedienteId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID del expediente para filtrar indicios"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Indicios"
+        ],
+        "summary": "Crear nuevo indicio",
+        "description": "Crea un nuevo indicio en el sistema",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Indicio",
+                "type": "object",
+                "required": [
+                  "expedienteId",
+                  "descripcion",
+                  "tecnicoId"
+                ],
+                "properties": {
+                  "expedienteId": {
+                    "type": "integer",
+                    "example": 1
+                  },
+                  "descripcion": {
+                    "type": "string",
+                    "example": "Cuchillo encontrado en la escena"
+                  },
+                  "color": {
+                    "type": "string",
+                    "example": "Plateado"
+                  },
+                  "tamano": {
+                    "type": "string",
+                    "example": "20cm"
+                  },
+                  "peso": {
+                    "type": "number",
+                    "format": "float",
+                    "example": 0.15
+                  },
+                  "ubicacion": {
+                    "type": "string",
+                    "example": "Mesa de la cocina"
+                  },
+                  "tecnicoId": {
+                    "type": "integer",
+                    "example": 1
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Indicio creado exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/Indicio"
+                        }
+                      }
+                    }
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "Indicio creado exitosamente"
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Indicio"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/indicios/{id}": {
+      "get": {
+        "tags": [
+          "Indicios"
+        ],
+        "summary": "Obtener indicio por ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID del indicio"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Indicio obtenido exitosamente",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponse"
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/Indicio"
+                        }
+                      }
+                    }
+                  ],
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean",
+                      "example": true
+                    },
+                    "data": {
+                      "$ref": "#/components/schemas/Indicio"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Indicio no encontrado"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Indicios"
+        ],
+        "summary": "Actualizar indicio",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Indicio",
+                "type": "object",
+                "properties": {
+                  "descripcion": {
+                    "type": "string"
+                  },
+                  "color": {
+                    "type": "string"
+                  },
+                  "tamano": {
+                    "type": "string"
+                  },
+                  "peso": {
+                    "type": "number",
+                    "format": "float"
+                  },
+                  "ubicacion": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Indicio actualizado exitosamente"
+          },
+          "404": {
+            "description": "Indicio no encontrado"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Indicios"
+        ],
+        "summary": "Eliminar indicio",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Indicio eliminado exitosamente"
+          },
+          "404": {
+            "description": "Indicio no encontrado"
+          }
+        }
+      }
+    },
+    "/api/indicios/expediente/{expedienteId}": {
+      "get": {
+        "tags": [
+          "Indicios"
+        ],
+        "summary": "Obtener indicios por expediente",
+        "parameters": [
+          {
+            "name": "expedienteId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID del expediente"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Indicios del expediente obtenidos exitosamente"
+          }
+        }
+      }
+    },
+    "/api/indicios/tecnico/{tecnicoId}": {
+      "get": {
+        "tags": [
+          "Indicios"
+        ],
+        "summary": "Obtener indicios por técnico",
+        "parameters": [
+          {
+            "name": "tecnicoId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "ID del técnico"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Indicios del técnico obtenidos exitosamente"
+          }
+        }
+      }
+    },
+    "/api/indicios/{id}/estado": {
+      "put": {
+        "summary": "Actualizar estado de una evidencia (aprobar/denegar)",
+        "tags": [
+          "Indicios"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "estado"
+                ],
+                "properties": {
+                  "estado": {
+                    "type": "string",
+                    "enum": [
+                      "Aprobada",
+                      "Denegada",
+                      "Pendiente"
+                    ],
+                    "example": "Aprobada"
+                  },
+                  "justificacionRechazo": {
+                    "type": "string",
+                    "description": "Requerido solo para estado \"Denegada\"",
+                    "example": "No cumple con los criterios de calidad"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Estado actualizado exitosamente"
+          },
+          "400": {
+            "description": "Datos inválidos"
+          },
+          "404": {
+            "description": "Evidencia no encontrada"
+          }
+        }
+      }
+    }
+  },
+  "tags": []
+}
