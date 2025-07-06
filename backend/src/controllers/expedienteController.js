@@ -117,12 +117,8 @@ class ExpedienteController {
         return errorResponse(res, 'Estado es requerido', 400);
       }
 
-      if (estado === 'Rechazado' && !justificacionRechazo) {
-        logger.warn('Missing justificacionRechazo for Rechazado estado');
-        return errorResponse(res, 'Justificación de rechazo es requerida', 400);
-      }
-
-      const updatedExpediente = await expedienteService.changeEstado(id, estado, justificacionRechazo);
+      // justificacionRechazo es opcional - puede ser null o undefined
+      const updatedExpediente = await expedienteService.changeEstado(id, estado, justificacionRechazo || null);
       
       if (!updatedExpediente) {
         logger.warn(`Expediente not found for estado change with id: ${id}`);

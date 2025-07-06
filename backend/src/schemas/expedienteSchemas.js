@@ -67,18 +67,14 @@ const expedienteChangeEstadoSchema = Joi.object({
       'any.required': 'El estado es requerido'
     }),
     
-  justificacionRechazo: Joi.when('estado', {
+  justificacionRechazo: Joi.string().allow('', null).when('estado', {
     is: 'Rechazado',
-    then: Joi.string()
-      .min(10)
-      .max(500)
-      .required()
-      .messages({
-        'string.min': 'La justificación debe tener al menos 10 caracteres',
-        'string.max': 'La justificación no puede tener más de 500 caracteres',
-        'any.required': 'La justificación de rechazo es requerida cuando el estado es Rechazado'
-      }),
-    otherwise: Joi.string().optional()
+    then: Joi.string().min(10).max(500).required().messages({
+      'string.min': 'La justificación debe tener al menos 10 caracteres',
+      'string.max': 'La justificación no puede tener más de 500 caracteres',
+      'any.required': 'La justificación de rechazo es requerida cuando el estado es Rechazado'
+    }),
+    otherwise: Joi.string().allow('', null).optional()
   })
 });
 

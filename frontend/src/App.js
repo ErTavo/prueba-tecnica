@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { ThemeProvider, createTheme } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { AppBar, Toolbar, Typography, Container, Button, Box, IconButton, Menu, MenuItem } from '@mui/material';
-import { AccountCircle, ExitToApp, Dashboard as DashboardIcon, Group, Folder, Search } from '@mui/icons-material';
+import { AccountCircle, ExitToApp, Dashboard as DashboardIcon, Group, Folder, Search, Assessment } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 
 import { AuthProvider, useAuth } from './contexts/AuthContext';
@@ -15,6 +15,7 @@ import Unauthorized from './components/Unauthorized';
 import UsersList from './components/Users/UsersList';
 import ExpedientesList from './components/Expedientes/ExpedientesList';
 import ExpedienteDetail from './components/Expedientes/ExpedienteDetail';
+import ReportesUsuarios from './components/Reportes/ReportesUsuarios';
 
 const theme = createTheme({
   palette: {
@@ -86,6 +87,17 @@ const NavBar = () => {
               Usuarios
             </Button>
           )}
+          
+          {hasPermission('reportes.ver') && (
+            <Button 
+              color="inherit" 
+              startIcon={<Assessment />}
+              onClick={() => navigate('/reportes')}
+              sx={{ mr: 1 }}
+            >
+              Reportes
+            </Button>
+          )}
         </Box>
         
         <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -149,6 +161,12 @@ function App() {
               <Route path="/usuarios" element={
                 <ProtectedRoute requiredPermission="usuarios.ver">
                   <UsersList />
+                </ProtectedRoute>
+              } />
+              
+              <Route path="/reportes" element={
+                <ProtectedRoute requiredPermission="reportes.ver">
+                  <ReportesUsuarios />
                 </ProtectedRoute>
               } />
               

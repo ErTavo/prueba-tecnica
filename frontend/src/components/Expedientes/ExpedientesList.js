@@ -186,7 +186,18 @@ const ExpedientesList = () => {
   const handleChangeEstado = async () => {
     try {
       setError(null);
-      await expedienteService.changeExpedienteEstado(changingEstado.Id, estadoData);
+      
+      // Preparar datos para enviar
+      const dataToSend = {
+        estado: estadoData.estado
+      };
+      
+      // Solo incluir justificacionRechazo si el estado es "Rechazado" y hay justificación
+      if (estadoData.estado === 'Rechazado' && estadoData.justificacionRechazo.trim()) {
+        dataToSend.justificacionRechazo = estadoData.justificacionRechazo.trim();
+      }
+      
+      await expedienteService.changeExpedienteEstado(changingEstado.Id, dataToSend);
       handleCloseEstadoDialog();
       loadData();
     } catch (err) {

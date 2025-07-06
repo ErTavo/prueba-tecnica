@@ -25,14 +25,18 @@ import {
   Chip
 } from '@mui/material';
 import {
-  Add as AddIcon,
   Edit as EditIcon,
   Delete as DeleteIcon,
-  Visibility as ViewIcon
+  Visibility as ViewIcon,
+  Assessment as ReportIcon
 } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 import userService from '../../services/userService';
+import { useAuth } from '../../contexts/AuthContext';
 
 const UsersList = () => {
+  const { hasPermission } = useAuth();
+  const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -63,18 +67,14 @@ const UsersList = () => {
     }
   };
 
-  const handleOpenDialog = (user = null) => {
+  const handleOpenDialog = (user) => {
+    if (!user) return; 
     setEditingUser(user);
-    setFormData(user ? {
+    setFormData({
       nombre: user.Nombre || '',
       usuario: user.Usuario || '',
       contraseña: '',
       rol: user.Rol || ''
-    } : {
-      nombre: '',
-      usuario: '',
-      contraseña: '',
-      rol: ''
     });
     setOpenDialog(true);
   };
@@ -102,12 +102,10 @@ const UsersList = () => {
           delete updateData.contraseña;
         }
         await userService.updateUser(editingUser.Id, updateData);
-      } else {
-        await userService.createUser(formData);
+        handleCloseDialog();
+        loadUsers();
       }
       
-      handleCloseDialog();
-      loadUsers(); 
     } catch (err) {
       console.error('Error guardando usuario:', err);
       setError(err.response?.data?.error || 'Error guardando el usuario');
@@ -150,13 +148,17 @@ const UsersList = () => {
         <Typography variant="h4" component="h1">
           Gestión de Usuarios
         </Typography>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={() => handleOpenDialog()}
-        >
-          Nuevo Usuario
-        </Button>
+        <Box sx={{ display: 'flex', gap: 2 }}>
+          {hasPermission('reportes.ver') && (
+            <Button
+              variant="outlined"
+              startIcon={<ReportIcon />}
+              onClick={() => navigate('/reportes')}
+            >
+              Ver Reportes
+            </Button>
+          )}
+        </Box>
       </Box>
 
       {error && (
@@ -222,7 +224,7 @@ const UsersList = () => {
       {/* Dialog para crear/editar usuario */}
       <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
         <DialogTitle>
-          {editingUser ? 'Editar Usuario' : 'Nuevo Usuario'}
+          Editar Usuario
         </DialogTitle>
         <DialogContent>
           <Box sx={{ pt: 1 }}>
@@ -244,12 +246,11 @@ const UsersList = () => {
             />
             <TextField
               fullWidth
-              label={editingUser ? "Nueva Contraseña (opcional)" : "Contraseña"}
+              label="Nueva Contraseña (opcional)"
               type="password"
               value={formData.contraseña}
               onChange={handleInputChange('contraseña')}
               margin="normal"
-              required={!editingUser}
             />
             <FormControl fullWidth margin="normal" required>
               <InputLabel>Rol</InputLabel>
@@ -270,9 +271,9 @@ const UsersList = () => {
           <Button
             onClick={handleSaveUser}
             variant="contained"
-            disabled={!formData.nombre || !formData.usuario || !formData.rol || (!editingUser && !formData.contraseña)}
+            disabled={!formData.nombre || !formData.usuario || !formData.rol}
           >
-            {editingUser ? 'Actualizar' : 'Crear'}
+            Actualizar
           </Button>
         </DialogActions>
       </Dialog>

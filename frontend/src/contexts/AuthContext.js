@@ -107,6 +107,10 @@ export const AuthProvider = ({ children }) => {
       'usuarios.editar': ['Admin'],
       'usuarios.eliminar': ['Admin'],
       
+      'reportes.ver': ['Supervisor', 'Admin'],
+      'reportes.generar': ['Supervisor', 'Admin'],
+      'reportes.exportar': ['Supervisor', 'Admin'],
+      
       'dashboard.estadisticas': ['Supervisor', 'Admin'],
       'dashboard.reportes': ['Supervisor', 'Admin']
     };
