@@ -159,31 +159,45 @@ class UserController {
   async loginUser(req, res) {
     try {
       console.log('🚀 UserController.loginUser iniciado');
+      console.log('📨 Request headers:', JSON.stringify(req.headers, null, 2));
+      console.log('📨 Request method:', req.method);
+      console.log('📨 Request URL:', req.url);
+      console.log('📨 Request body type:', typeof req.body);
+      console.log('📨 Request body keys:', Object.keys(req.body || {}));
+      
       const requestData = req.body;
       console.log('📨 Request body recibido:', JSON.stringify(requestData, null, 2));
       
+      // Intentar múltiples formas de extraer usuario y contraseña
       const user = requestData.usuario || requestData.user || requestData.Usuario;
-      const pass = requestData.contraseña || requestData.pass || requestData.Contraseña || requestData.contrasenia;
+      const pass = requestData.contraseña || requestData.pass || requestData.Contraseña || requestData.contrasenia || requestData.password;
       
       console.log('📧 Usuario extraído:', user);
-      console.log('🔑 Contraseña extraída:', pass ? '***' : 'undefined');
+      console.log('🔑 Contraseña extraída:', pass ? `[LONGITUD: ${pass.length}]` : 'undefined');
+      console.log('🔑 Contraseña tipo:', typeof pass);
       
       // Validate required fields
       if (!user || !pass) {
         console.log('❌ Faltan campos requeridos: user y pass');
+        console.log('❌ User exists:', !!user, 'Pass exists:', !!pass);
         return errorResponse(res, 'Usuario y contraseña son requeridos', 400);
       }
 
+      if (typeof user !== 'string' || typeof pass !== 'string') {
+        console.log('❌ Tipos de datos incorrectos');
+        return errorResponse(res, 'Usuario y contraseña deben ser strings', 400);
+      }
+
       if (user.trim() === '' || pass.trim() === '') {
-        console.log('❌ Campos vacíos');
+        console.log('❌ Campos vacíos después de trim');
         return errorResponse(res, 'Usuario y contraseña no pueden estar vacíos', 400);
       }
 
       console.log('🔍 Llamando a userService.validateLogin...');
-      const result = await userService.validateLogin(user, pass);
-      console.log('📤 Resultado del servicio:', JSON.stringify(result, null, 2));
+      const result = await userService.validateLogin(user.trim(), pass.trim());
+      console.log('📤 Resultado del servicio valid:', result && result.valid);
       
-      if (!result || !result.isValid) {
+      if (!result || !result.valid) {
         console.log('❌ Credenciales inválidas');
         return errorResponse(res, 'Credenciales inválidas', 401);
       }

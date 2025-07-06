@@ -159,7 +159,7 @@ class UserService {
     try {
       console.log('🔍 UserService.validateLogin iniciado');
       console.log('📧 Usuario recibido:', usuario);
-      console.log('🔑 Contraseña recibida:', contraseña ? '***' : 'undefined');
+      console.log('🔑 Contraseña recibida: [OCULTA]');
       
       const user = await this.getUserByUsername(usuario);
       console.log('👤 Usuario encontrado en DB:', user ? 'SÍ' : 'NO');
@@ -169,8 +169,10 @@ class UserService {
         return { valid: false, user: null };
       }
 
-      console.log('💾 Contraseña en DB:', user.Contraseña);
-      const isValidPassword = contraseña === user.Contraseña; // Comparación directa sin encriptación
+      console.log('💾 Contraseña en DB: [OCULTA]');
+      
+      // Validación directa sin encriptación
+      const isValidPassword = contraseña === user.Contraseña;
       console.log('🔐 Resultado validación contraseña:', isValidPassword);
       
       if (!isValidPassword) {

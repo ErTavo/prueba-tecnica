@@ -25,8 +25,29 @@ app.use(basicSecurity);
 
 app.use(corsHandler);
 
+// Middleware de debugging para requests
+app.use((req, res, next) => {
+  if (req.url.includes('/login')) {
+    console.log('🐛 DEBUG Middleware - Login request detected');
+    console.log('🐛 Content-Type:', req.get('Content-Type'));
+    console.log('🐛 Body before parsing:', req.body);
+  }
+  next();
+});
+
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Middleware de debugging DESPUÉS del parsing
+app.use((req, res, next) => {
+  if (req.url.includes('/login')) {
+    console.log('🐛 DEBUG Middleware - After parsing');
+    console.log('🐛 Body after parsing:', req.body);
+    console.log('🐛 Body type:', typeof req.body);
+    console.log('🐛 Body keys:', Object.keys(req.body || {}));
+  }
+  next();
+});
 
 app.get('/health', (req, res) => {
   res.json({
