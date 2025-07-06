@@ -43,7 +43,7 @@ docker exec -i mp-dicri-sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U 
 
 docker exec -i mp-dicri-sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "huk3ym65ac8%%P" -C -d MP_DICRI -Q "IF NOT EXISTS (SELECT 1 FROM Usuarios WHERE Usuario = 'supervisor1') BEGIN INSERT INTO Usuarios (Nombre, Usuario, Contraseña, Rol) VALUES ('Maria Garcia', 'supervisor1', 'password123', 'Supervisor'); END" > nul 2>&1
 
-docker exec -i mp-dicri-sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "huk3ym65ac8%%P" -C -d MP_DICRI -Q "IF NOT EXISTS (SELECT 1 FROM Usuarios WHERE Usuario = 'admin1') BEGIN INSERT INTO Usuarios (Nombre, Usuario, Contraseña, Rol) VALUES ('Carlos Admin', 'admin1', 'password123', 'Admin'); END" > nul 2>&1
+docker exec -i mp-dicri-sqlserver /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P "huk3ym65ac8%%P" -C -d MP_DICRI -Q "IF NOT EXISTS (SELECT 1 FROM Usuarios WHERE Usuario = 'ggutierrez') BEGIN INSERT INTO Usuarios (Nombre, Usuario, Contraseña, Rol) VALUES ('Gustavo Gutierrez', 'ggutierrez', 'password123', 'Admin'); END" > nul 2>&1
 
 echo    Base de datos inicializada!
 echo [4.1] Ejecutando init.sql...

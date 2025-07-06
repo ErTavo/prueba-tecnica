@@ -43,43 +43,6 @@ docker-compose ps
 
 Una vez que el sistema esté funcionando, agregar los siguientes usuarios ejecutando estos scripts SQL:
 
-#### 1. Usuario Técnico
-```sql
-INSERT INTO Usuarios (Nombre, Usuario, Contraseña, Rol, Activo, FechaCreacion) 
-VALUES (
-    'Juan Pérez Técnico', 
-    'tecnico1', 
-    '$2b$10$LQDZOjgD7z8K9mV7XeA.HePm7VhF.1Z5oVo2G.5K2J8mE3fA7bGKu', -- password123
-    'Tecnico', 
-    1, 
-    GETDATE()
-);
-```
-
-#### 2. Usuario Supervisor  
-```sql
-INSERT INTO Usuarios (Nombre, Usuario, Contraseña, Rol, Activo, FechaCreacion) 
-VALUES (
-    'María García Supervisor', 
-    'supervisor1', 
-    '$2b$10$LQDZOjgD7z8K9mV7XeA.HePm7VhF.1Z5oVo2G.5K2J8mE3fA7bGKu', -- password123
-    'Supervisor', 
-    1, 
-    GETDATE()
-);
-```
-
-#### 3. Usuario Administrador
-```sql
-INSERT INTO Usuarios (Nombre, Usuario, Contraseña, Rol, Activo, FechaCreacion) 
-VALUES (
-    'Carlos Rodríguez Admin', 
-    'admin1', 
-    '$2b$10$LQDZOjgD7z8K9mV7XeA.HePm7VhF.1Z5oVo2G.5K2J8mE3fA7bGKu', -- password123
-    'Admin', 
-    1, 
-    GETDATE()
-);
 ```
 
 ### Credenciales de Login

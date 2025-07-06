@@ -69,9 +69,9 @@ GO
 IF NOT EXISTS (SELECT * FROM Usuarios)
 BEGIN
     INSERT INTO Usuarios (Nombre, Usuario, Contraseña, Rol) VALUES 
-    ('Administrador', 'admin', 'admin123', 'Administrador'),
-    ('Técnico 1', 'tecnico1', 'tech123', 'Técnico'),
-    ('Técnico 2', 'tecnico2', 'tech123', 'Técnico');
+    ('Gustavo Gutierrez', 'ggutierrez', 'password123', 'Admin'),
+    ('Juan Perez', 'jperez', 'password123', 'Tecnico'),
+    ('Catherine Aguilar', 'caguilar', 'password123', 'Supervisor');
 END
 GO
 
