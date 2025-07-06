@@ -16,11 +16,8 @@ cd mp-dicri-app
 
 ### 2. Levantar el Sistema con Docker
 ```bash
-# Construir e iniciar todos los servicios
-docker-compose up -d --build
+# abrir el archivo run.bat
 
-# Verificar que los contenedores estén funcionando
-docker-compose ps
 ```
 
 ### 3. Verificar el Sistema
@@ -42,17 +39,6 @@ docker-compose ps
 ### Usuarios Iniciales del Sistema
 
 Una vez que el sistema esté funcionando, agregar los siguientes usuarios ejecutando estos scripts SQL:
-
-```
-
-### Credenciales de Login
-| Usuario | Contraseña | Rol | Permisos |
-|---------|------------|-----|----------|
-| `tecnico1` | `password123` | Técnico | Crear/editar indicios y expedientes |
-| `supervisor1` | `password123` | Supervisor | Aprobar/rechazar + permisos de técnico |
-| `admin1` | `password123` | Admin | Acceso completo al sistema |
-
----
 
 ## 🐳 Comandos Docker Útiles
 
